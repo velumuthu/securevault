@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SecureVault - A simple and secure file encryptor/decryptor. Encrypt your files with a password and download them securely.">
+  <title>SecureVault - File Encryptor</title>
+  <link rel="icon" href="title.jpg" type="image/x-icon">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">🔐 SecureVault</a>
+      <div class="menu-toggle" id="mobile-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="#encrypt">Encrypt</a></li>
+        <li><a href="#decrypt">Decrypt</a></li>
+        <li><a href="report.html" target="_blank">Help</a></li>
+        <li><a href="#contact" onclick="window.location='https://wa.me/917639765325'">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <h1>🔐 File Encryptor/Decryptor</h1>
+    
+    <div id="alertBox" class="alert" style="display:none;"></div>
+    
+    <div class="sections-container">
+      <section id="encrypt">
+        <h2>🔐 Encrypt a File</h2>
+        <input type="file" id="encryptFile" accept="*/*"><br>
+        <input type="password" id="encryptPassword" placeholder="Enter Password"><br>
+        <button onclick="encryptFile()">Encrypt & Download</button>
+      </section>
+
+      <section id="decrypt">
+        <h2>🔓 Decrypt & Upload File</h2>
+        <input type="file" id="decryptFile" accept="*/*"><br>
+        <input type="password" id="decryptPassword" placeholder="Enter Password"><br>
+        <button onclick="decryptFile()">Decrypt & Download</button>
+        
+        <h3>☁️ Upload Encrypted File</h3>
+        <form id="uploadForm" enctype="multipart/form-data" method="POST" action="/upload">
+          <input type="file" name="file" id="fileUpload" accept="*/*"><br>
+          <input type="submit" value="Upload Encrypted File">
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+        <a href="#security">Security</a>
+        <a href="#support">Support</a>
+        <a href="#api">API</a>
+      </div>
+      <div class="footer-info">
+        © 2025 SecureVault. All rights reserved. Built with security in mind.
+      </div>
+    </div>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

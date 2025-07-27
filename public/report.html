@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Project report for the SecureVault file encryptor web application. Learn about its features, architecture, and usage.">
+  <link rel="icon" href="title.jpg" type="image/x-icon">
+  <title>File Encryptor Web App – Project Report</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4338ca;
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --gray-900: #111827;
+      --gray-800: #1f2937;
+      --gray-700: #374151;
+      --gray-100: #f3f4f6;
+      --white: #ffffff;
+      --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--dark);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: var(--dark);
+    }
+
+    .bg-animation::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(1deg); }
+      66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 80px 20px 60px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      animation: slideInDown 1s ease-out;
+    }
+
+    .header .subtitle {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      max-width: 600px;
+      margin: 0 auto;
+      animation: slideInUp 1s ease-out 0.2s both;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+      animation: slideInUp 0.8s ease-out both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-xl);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    /* Card headers */
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .card h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    /* Features grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .feature-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .feature-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--gradient-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+
+    /* Code blocks */
+    .code-block {
+      background: var(--gray-900);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .code-block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(90deg, #ff5f56, #ffbd2e, #27ca3f);
+      border-radius: 16px 16px 0 0;
+      opacity: 0.1;
+    }
+
+    .code-block code {
+      color: #e2e8f0;
+      background: none;
+      padding: 0;
+    }
+
+    /* Inline code */
+    code {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin: 16px 0;
+      padding-left: 24px;
+    }
+
+    li {
+      margin: 12px 0;
+      color: #cbd5e1;
+    }
+
+    li::marker {
+      color: var(--primary);
+    }
+
+    /* Steps */
+    .steps {
+      counter-reset: step-counter;
+    }
+
+    .step {
+      counter-increment: step-counter;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 16px 0;
+      position: relative;
+      padding-left: 80px;
+    }
+
+    .step::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 24px;
+      top: 24px;
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 14px;
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      margin: 4px 8px 4px 0;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    /* Security note */
+    .security-note {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+
+    .security-note .icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    /* Future improvements */
+    .improvement-item {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 12px 0;
+      transition: all 0.3s ease;
+    }
+
+    .improvement-item:hover {
+      background: rgba(16, 185, 129, 0.15);
+      transform: translateX(8px);
+    }
+
+    /* Animations */
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card {
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .step {
+        padding-left: 60px;
+      }
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+    }
+
+    .scroll-progress {
+      height: 100%;
+      background: var(--gradient-primary);
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+  <div class="scroll-indicator">
+    <div class="scroll-progress" id="scrollProgress"></div>
+  </div>
+
+  <div class="header">
+    <h1>🔐 File Encryptor & Decryptor</h1>
+    <p class="subtitle">Secure client-side file encryption with automatic server upload capabilities</p>
+  </div>
+
+  <div class="container">
+    <div class="card" style="animation-delay: 0.1s">
+      <div class="card-header">
+        <div class="card-icon">📝</div>
+        <h2>Project Overview</h2>
+      </div>
+      <p>This cutting-edge web application enables users to securely <strong>encrypt</strong> and <strong>decrypt</strong> files directly in the browser using advanced <code>AES encryption</code>. The application features seamless automatic uploading of encrypted files to the server, providing a complete end-to-end encryption solution.</p>
+    </div>
+
+    <div class="card" style="animation-delay: 0.2s">
+      <div class="card-header">
+        <div class="card-icon">✨</div>
+        <h2>Key Features</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <h3>AES Encryption</h3>
+          <p>Military-grade encryption using CryptoJS with password-based security</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📁</div>
+          <h3>File Download</h3>
+          <p>Encrypted files automatically download with <code>.enc</code> extension</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔓</div>
+          <h3>Decryption</h3>
+          <p>Restore original files using the same password authentication</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">☁️</div>
+          <h3>Auto Upload</h3>
+          <p>Seamless server upload without manual intervention required</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <h3>Node.js Backend</h3>
+          <p>Robust server architecture built with Express framework</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💾</div>
+          <h3>File Storage</h3>
+          <p>Secure file management using Multer in dedicated uploads directory</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay: 0.3s">
+      <div class="card-header">
+        <div class="card-icon">📂</div>
+        <h2>Project Architecture</h2>
+      </div>
+      <div class="code-block">
+        <code>/project-folder
+├── public/
+│   ├── index.html          # Main application interface
+│   ├── script.js           # Client-side encryption logic
+│   └── style.css           # Application styling
+├── uploads/                # Encrypted file storage
+├── server.js               # Express server configuration
+└── report.html             # Project documentation</code>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay: 0.4s">
+      <div class="card-header">
+        <div class="card-icon">⚙️</div>
+        <h2>Installation & Setup</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <h3>Install Node.js</h3>
+          <p>Download and install Node.js from <a href="https://nodejs.org" target="_blank" style="color: var(--accent);">nodejs.org</a></p>
+        </div>
+        <div class="step">
+          <h3>Initialize Project</h3>
+          <div class="code-block">
+            <code>npm init -y
+npm install express multer</code>
+          </div>
+        </div>
+        <div class="step">
+          <h3>Start Server</h3>
+          <div class="code-block">
+            <code>node server.js</code>
+          </div>
+        </div>
+        <div class="step">
+          <h3>Access Application</h3>
+          <p>Open your browser and navigate to:</p>
+          <div class="code-block">
+            <code>http://localhost:3000</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay: 0.5s">
+      <div class="card-header">
+        <div class="card-icon">🧪</div>
+        <h2>Usage Guide</h2>
+      </div>
+      
+      <h3 style="color: var(--success); margin-top: 32px;">🔐 File Encryption Process</h3>
+      <ul>
+        <li>Select your target file under the "Encrypt a File" section</li>
+        <li>Enter a secure password (minimum 4 characters required)</li>
+        <li>Click <strong>Encrypt & Download</strong> to process the file</li>
+        <li>Encrypted file automatically downloads and uploads to server</li>
+      </ul>
+
+      <h3 style="color: var(--accent); margin-top: 32px;">🔓 File Decryption Process</h3>
+      <ul>
+        <li>Select the encrypted <code>.enc</code> file under "Decrypt File"</li>
+        <li>Enter the original password used during encryption</li>
+        <li>Click <strong>Decrypt & Download</strong> to restore the file</li>
+        <li>Original file will be downloaded to your device</li>
+      </ul>
+
+      <div style="margin-top: 32px;">
+        <h3 style="color: var(--warning);">📁 Storage Location</h3>
+        <p>All encrypted files are securely stored in the <code>/uploads</code> directory within your project folder.</p>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay: 0.6s">
+      <div class="card-header">
+        <div class="card-icon">🛡️</div>
+        <h2>Security Implementation</h2>
+      </div>
+      <div class="security-note">
+        <div class="icon">⚠️</div>
+        <h3>Critical Security Information</h3>
+        <p>This application implements <strong>CryptoJS AES encryption</strong> for maximum security. Ensure your password is strong and store it safely. <strong>Without the correct password, encrypted files cannot be recovered.</strong></p>
+      </div>
+      <div style="margin-top: 24px;">
+        <span class="tag">AES Encryption</span>
+        <span class="tag">Password Protected</span>
+        <span class="tag">Client-Side Processing</span>
+        <span class="tag">Secure Storage</span>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay: 0.7s">
+      <div class="card-header">
+        <div class="card-icon">🚀</div>
+        <h2>Future Enhancements</h2>
+      </div>
+      <div class="improvement-item">
+        <strong>🔐 User Authentication</strong>
+        <p>Implement comprehensive user login and multi-factor authentication system</p>
+      </div>
+      <div class="improvement-item">
+        <strong>🎨 Drag & Drop Interface</strong>
+        <p>Modern file upload experience with intuitive drag-and-drop functionality</p>
+      </div>
+      <div class="improvement-item">
+        <strong>☁️ Cloud Integration</strong>
+        <p>Support for major cloud storage providers and secure email sharing</p>
+      </div>
+      <div class="improvement-item">
+        <strong>🔑 Key Management</strong>
+        <p>Advanced key export and secure recovery mechanisms</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Scroll progress indicator
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      document.getElementById('scrollProgress').style.width = scrollPercent + '%';
+    });
+
+    // Card animation on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.card').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(30px)';
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(card);
+    });
+
+    // Feature items hover effect
+    document.querySelectorAll('.feature-item').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        item.style.transform = 'translateY(-4px) scale(1.02)';
+      });
+      
+      item.addEventListener('mouseleave', () => {
+        item.style.transform = 'translateY(-2px) scale(1)';
+      });
+    });
+  </script>
+</body>
+</html>
